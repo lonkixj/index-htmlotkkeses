@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Кейсы с эмодзи</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+  button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+  .case { border: 2px solid #333; padding: 20px; margin: 20px; display: inline-block; background: #fff; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Кейсы с эмодзи</h1>
+
+<div class="case">
+  <h2>Обычный кейс</h2>
+  <button id="openNormal">Открыть кейс</button>
+  <p id="normalResult">🎲</p>
+  <p id="normalTimer"></p>
+</div>
+
+<div class="case">
+  <h2>Платный кейс</h2>
+  <button id="openPremium">Купить и открыть кейс</button>
+  <p id="premiumResult">💎</p>
+  <p id="premiumTimer"></p>
+</div>
+
+<script>
+const normalEmojis = ['😀','😎','😂','🤩','🥳'];
+const premiumEmojis = ['👑','💎','🚀','🦄','🔥'];
+
+const NORMAL_KEY = 'normalCaseTime';
+const PREMIUM_KEY = 'premiumCaseTime';
+const TIMER = 48 * 60 * 60 * 1000; // 48 часов в мс
+
+function canOpen(key) {
+  const lastTime = localStorage.getItem(key);
+  if (!lastTime) return true;
+  return Date.now() - lastTime >= TIMER;
+}
+
+function updateTimer(key, elementId) {
+  const lastTime = localStorage.getItem(key);
+  if (!lastTime) return;
+  let diff = TIMER - (Date.now() - lastTime);
+  if (diff <= 0) {
+    document.getElementById(elementId).textContent = '';
+    return;
+  }
+  const hours = Math.floor(diff / (1000*60*60));
+  const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((diff % (1000*60)) / 1000);
+  document.getElementById(elementId).textContent = `Можно открыть через ${hours}ч ${minutes}м ${seconds}с`;
+  setTimeout(() => updateTimer(key, elementId), 1000);
+}
+
+document.getElementById('openNormal').onclick = () => {
+  if (!canOpen(NORMAL_KEY)) { alert('Обычный кейс можно открыть только раз в 48 часов'); return; }
+  const emoji = normalEmojis[Math.floor(Math.random() * normalEmojis.length)];
+  document.getElementById('normalResult').textContent = emoji;
+  localStorage.setItem(NORMAL_KEY, Date.now());
+  updateTimer(NORMAL_KEY, 'normalTimer');
+};
+
+document.getElementById('openPremium').onclick = () => {
+  if (!canOpen(PREMIUM_KEY)) { alert('Платный кейс можно открыть только раз в 48 часов'); return; }
+  const emoji = premiumEmojis[Math.floor(Math.random() * premiumEmojis.length)];
+  document.getElementById('premiumResult').textContent = emoji;
+  localStorage.setItem(PREMIUM_KEY, Date.now());
+  updateTimer(PREMIUM_KEY, 'premiumTimer');
+};
+
+// Запускаем таймеры при загрузке
+updateTimer(NORMAL_KEY, 'normalTimer');
+updateTimer(PREMIUM_KEY, 'premiumTimer');
+</script>
+
+</body>
+</html>
