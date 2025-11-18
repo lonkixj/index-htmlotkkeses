@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Кейсы с NFT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg,#6a11cb,#2575fc);
+  color: #fff;
+  text-align: center;
+}
+h1 { margin: 20px; }
+#coinsBox {
+  border: 2px solid #fff;
+  border-radius: 12px;
+  padding: 10px 20px;
+  display: inline-block;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 18px;
+  background: rgba(0,0,0,0.2);
+}
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: #ffcc00;
+  color: #000;
+  transition: transform 0.2s;
+}
+button:hover { transform: scale(1.05); }
+.case {
+  display: block;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  margin: 15px auto;
+  border-radius: 12px;
+  max-width: 350px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+#inventory { margin-top: 20px; max-width: 400px; margin-left:auto;margin-right:auto;}
+.nft-item {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.2);
+  margin: 5px 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nft-emoji { font-size: 24px; }
+.effect { animation: pop 0.5s ease; }
+@keyframes pop { 0% {transform: scale(0);} 100% {transform: scale(1);} }
+/* Мобильные стили */
+@media(max-width:480px){
+  button{width:90%; font-size:18px;}
+  .case{max-width:90%;}
+  .nft-item{flex-direction:column;align-items:flex-start;}
+}
+.info { font-size: 12px; margin-top: 5px; background: rgba(255,255,255,0.2); padding: 5px; border-radius: 5px;}
+</style>
+</head>
+<body>
+
+<h1>Кейсы с NFT</h1>
+<div id="coinsBox">Монеты: <span id="coins">0</span> 💰</div>
+
+<div id="casesContainer"></div>
+
+<h2>Инвентарь</h2>
+<div id="inventory"></div>
+<p>Общая стоимость NFT: <span id="totalValue">0</span> 💰</p>
+
+<script>
+let coins = parseInt(localStorage.getItem('coins')) || 1000;
+document.getElementById('coins').textContent = coins;
+
+const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+function saveInventory(){ localStorage.setItem('inventory', JSON.stringify(inventory)); }
+
+function renderInventory(){
+  const invDiv = document.getElementById('inventory');
+  invDiv.innerHTML='';
+  let total=0;
+  inventory.forEach((item,index)=>{
+    total+=item.price;
+    const div=document.createElement('div');
+    div.className='nft-item';
+    div.innerHTML=`<span class="nft-emoji">${item.emoji}</span>
+                   <span>${item.name} - ${item.price}💰</span>
+                   <button onclick="sellNFT(${index})">Продать</button>`;
+    invDiv.appendChild(div);
+  });
+  document.getElementById('totalValue').textContent = total;
+}
+
+function sellNFT(index){
+  coins += inventory[index].price;
+  localStorage.setItem('coins',coins);
+  document.getElementById('coins').textContent = coins;
+  inventory.splice(index,1);
+  saveInventory();
+  renderInventory();
+}
+
+// Настраиваем 10 кейсов
+const cases = [
+  {name:"Обычный кейс", price:100, emojis:[
+      {emoji:'😀',price:50,chance:40},
+      {emoji:'😎',price:70,chance:30},
+      {emoji:'😂',price:60,chance:20},
+      {emoji:'🤩',price:90,chance:7},
+      {emoji:'🥳',price:100,chance:3}
+  ]},
+  {name:"Редкий кейс", price:250, emojis:[
+      {emoji:'👑',price:200,chance:40},
+      {emoji:'💎',price:250,chance:30},
+      {emoji:'🚀',price:220,chance:20},
+      {emoji:'🦄',price:230,chance:7},
+      {emoji:'🔥',price:240,chance:3}
+  ]},
+  {name:"Эпический кейс", price:400, emojis:[
+      {emoji:'🌟',price:350,chance:50},
+      {emoji:'⚡',price:400,chance:30},
+      {emoji:'🎯',price:380,chance:15},
+      {emoji:'🏆',price:420,chance:4},
+      {emoji:'💫',price:450,chance:1}
+  ]},
+  {name:"Легендарный кейс", price:600, emojis:[
+      {emoji:'🛡️',price:550,chance:50},
+      {emoji:'🗡️',price:580,chance:30},
+      {emoji:'🏹',price:600,chance:15},
+      {emoji:'🧿',price:630,chance:4},
+      {emoji:'⚔️',price:650,chance:1}
+  ]},
+  {name:"Магический кейс", price:800, emojis:[
+      {emoji:'🪄',price:750,chance:50},
+      {emoji:'🔮',price:780,chance:30},
+      {emoji:'🕯️',price:800,chance:15},
+      {emoji:'🧙‍♂️',price:830,chance:4},
+      {emoji:'🧝‍♀️',price:850,chance:1}
+  ]},
+  {name:"Драгоценный кейс", price:1000, emojis:[
+      {emoji:'💎',price:950,chance:50},
+      {emoji:'🪙',price:980,chance:30},
+      {emoji:'🏅',price:1000,chance:15},
+      {emoji:'🥇',price:1030,chance:4},
+      {emoji:'🏆',price:1050,chance:1}
+  ]},
+  {name:"Титан кейс", price:1200, emojis:[
+      {emoji:'🗿',price:1150,chance:50},
+      {emoji:'⚔️',price:1180,chance:30},
+      {emoji:'🛡️',price:1200,chance:15},
+      {emoji:'🏹',price:1230,chance:4},
+      {emoji:'🪄',price:1250,chance:1}
+  ]},
+  {name:"Космический кейс", price:1500, emojis:[
+      {emoji:'🚀',price:1450,chance:50},
+      {emoji:'🪐',price:1480,chance:30},
+      {emoji:'🌌',price:1500,chance:15},
+      {emoji:'🌟',price:1530,chance:4},
+      {emoji:'💫',price:1550,chance:1}
+  ]},
+  {name:"Мифический кейс", price:1800, emojis:[
+      {emoji:'🐉',price:1750,chance:50},
+      {emoji:'🦄',price:1780,chance:30},
+      {emoji:'🧝',price:1800,chance:15},
+      {emoji:'🧙',price:1830,chance:4},
+      {emoji:'🪄',price:1850,chance:1}
+  ]},
+  {name:"Божественный кейс", price:2000, emojis:[
+      {emoji:'⚡',price:1950,chance:50},
+      {emoji:'🌟',price:1980,chance:30},
+      {emoji:'🏆',price:2000,chance:15},
+      {emoji:'💎',price:2030,chance:4},
+      {emoji:'👑',price:2050,chance:1}
+  ]}
+];
+
+function generateCases(){
+  const container = document.getElementById('casesContainer');
+  cases.forEach((c,index)=>{
+    const div = document.createElement('div');
+    div.className='case';
+    let info='';
+    c.emojis.forEach(e=>{ info += `${e.emoji} ${e.price}💰 - ${e.chance}%<br>` });
+    div.innerHTML=`<h3>${c.name} (Цена: ${c.price})</h3>
+                   <button onclick="openCase(${index})">Открыть кейс</button>
+                   <p class="info">Может выпасть:<br>${info}</p>
+                   <p id="result${index}"></p>`;
+    container.appendChild(div);
+  });
+}
+
+function openCase(index){
+  const c = cases[index];
+  if(coins<c.price){ alert('Недостаточно монет'); return; }
+  coins -= c.price;
+  localStorage.setItem('coins',coins);
+  document.getElementById('coins').textContent=coins;
+
+  // Выбор эмодзи по шансам
+  const rand=Math.random()*100;
+  let sum=0;
+  let selected;
+  c.emojis.forEach(e=>{
+    sum+=e.chance;
+    if(!selected && rand<=sum) selected=e;
+  });
+  if(!selected) selected = c.emojis[0];
+
+  const name='NFT#'+Math.floor(Math.random()*1000);
+  inventory.push({...selected,name});
+  saveInventory();
+  renderInventory();
+
+  const result=document.getElementById('result'+index);
+  result.textContent=selected.emoji+' '+name;
+  result.classList.add('effect');
+  setTimeout(()=> result.classList.remove('effect'),500);
+}
+
+generateCases();
+renderInventory();
+</script>
+</body>
+</html>
