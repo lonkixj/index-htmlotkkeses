@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Кейсы с NFT</title>
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+h1 { margin-top: 20px; }
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: #ffcc00;
+  color: #000;
+  transition: transform 0.2s;
+}
+button:hover { transform: scale(1.1); }
+.case { display: inline-block; background: rgba(255,255,255,0.1); padding: 20px; margin: 20px; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+#inventory { margin-top: 30px; }
+.nft-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); margin: 5px 0; padding: 5px 10px; border-radius: 8px; align-items: center; }
+.nft-emoji { font-size: 24px; }
+.effect { animation: pop 0.5s ease; }
+@keyframes pop { 0% {transform: scale(0);} 100% {transform: scale(1);} }
+</style>
+</head>
+<body>
+
+<h1>Кейсы с NFT</h1>
+<p>Монеты: <span id="coins">0</span> 💰</p>
+
+<div class="case">
+  <h2>Обычный кейс (Цена: 100)</h2>
+  <button id="openNormal">Открыть кейс</button>
+  <p id="normalResult">🎲</p>
+</div>
+
+<div class="case">
+  <h2>Платный кейс (Цена: 500)</h2>
+  <button id="openPremium">Купить и открыть кейс</button>
+  <p id="premiumResult">💎</p>
+</div>
+
+<h2>Инвентарь</h2>
+<div id="inventory"></div>
+<p>Общая стоимость NFT: <span id="totalValue">0</span> 💰</p>
+
+<script>
+let coins = parseInt(localStorage.getItem('coins')) || 1000; // стартовые монеты
+document.getElementById('coins').textContent = coins;
+
+const normalEmojis = [
+  {emoji:'😀', price:50},
+  {emoji:'😎', price:70},
+  {emoji:'😂', price:60},
+  {emoji:'🤩', price:90},
+  {emoji:'🥳', price:100}
+];
+const premiumEmojis = [
+  {emoji:'👑', price:300},
+  {emoji:'💎', price:500},
+  {emoji:'🚀', price:400},
+  {emoji:'🦄', price:350},
+  {emoji:'🔥', price:450}
+];
+
+const NORMAL_PRICE = 100;
+const PREMIUM_PRICE = 500;
+
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+function saveInventory() {
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+}
+
+function renderInventory() {
+  const invDiv = document.getElementById('inventory');
+  invDiv.innerHTML = '';
+  let total = 0;
+  inventory.forEach((item, index) => {
+    total += item.price;
+    const div = document.createElement('div');
+    div.className = 'nft-item';
+    div.innerHTML = `<span class="nft-emoji">${item.emoji}</span>
+                     <span>${item.name} - ${item.price}💰</span>
+                     <button onclick="sellNFT(${index})">Продать</button>`;
+    invDiv.appendChild(div);
+  });
+  document.getElementById('totalValue').textContent = total;
+}
+
+function sellNFT(index) {
+  coins += inventory[index].price;
+  localStorage.setItem('coins', coins);
+  document.getElementById('coins').textContent = coins;
+  inventory.splice(index,1);
+  saveInventory();
+  renderInventory();
+}
+
+function openCase(emojis, price, resultId) {
+  if(coins < price) { alert('Недостаточно монет'); return; }
+  coins -= price;
+  localStorage.setItem('coins', coins);
+  document.getElementById('coins').textContent = coins;
+  const item = emojis[Math.floor(Math.random()*emojis.length)];
+  const name = 'NFT #' + Math.floor(Math.random()*1000);
+  inventory.push({...item, name});
+  saveInventory();
+  renderInventory();
+
+  const result = document.getElementById(resultId);
+  result.textContent = item.emoji + ' ' + name;
+  result.classList.add('effect');
+  setTimeout(()=> result.classList.remove('effect'),500);
+}
+
+document.getElementById('openNormal').onclick = () => openCase(normalEmojis, NORMAL_PRICE, 'normalResult');
+document.getElementById('openPremium').onclick = () => openCase(premiumEmojis, PREMIUM_PRICE, 'premiumResult');
+
+renderInventory();
+</script>
+</body>
+  </html>
